@@ -7,15 +7,23 @@
  Django + DRF + Vuejs + Element + MySQL
 
 # 运行方式
-此目录下运行
-```
-1.先 cd 到 ./src/frontend/ 下
-运行 npm install 命令安装前端相关依赖
-2.返回到与本README.MD同级的目录下
-运行 docker-compose up 命令，启动前后端服务器
-(如果运行有问题，可能是后端缺少相关依赖，请 cd 到 /src/backend/下 pip install安装缺少的依赖)
-3.在浏览器中访问 http://frontend.docker.io 访问相关服务
-```
+
+#### 1.此目录下运行 ``docker-compose build``
+#####  如果有什么依赖的安装出现问题，可能需要（正常不用）：
+#####    （1）先 cd 到 ./src/frontend/ 下
+#####    （2）运行 npm install 命令安装前端相关依赖
+    
+#### 2.返回到与本README.MD同级的目录下
+####  运行 ``docker-compose up`` 命令，启动前后端服务器
+##### (如果运行有问题，可能是后端缺少相关依赖，请 cd 到 /src/backend/下 pip install安装缺少的依赖)
+
+#### 3.``docker exec -it <backend-docker-container-id> /bin/bash``
+####  进入bash环境后，运行``python manage.py makemigrations``, ``python manage.py migrate``建表
+  
+#### 4.在浏览器中访问 http://frontend.docker.io ,访问相关服务
+
+#### 5.注册或者登录后多留言几条哦！
+
 # 目录结构
 ###### 后端相关
 ```
