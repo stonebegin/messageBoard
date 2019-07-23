@@ -1,0 +1,29 @@
+FROM python:latest
+
+RUN apt-get update \
+    && apt-get install -yq --no-install-recommends \
+        python3-psycopg2 \
+        postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# RUN apt-get install -y default-libmysqlclient-dev build-essential \
+#  &&  yum install mysql-devel
+
+RUN pip3 install pipenv
+
+WORKDIR /opt/backend
+
+COPY Pipfile ./
+COPY Pipfile.lock ./
+RUN pipenv install --system
+RUN pip3 install psycopg2-binary gunicorn mysqlclient pymysql
+
+COPY ./src/backend /opt/backend
+
+EXPOSE 8002
+ENTRYPOINT ["python", "manage.py"]
+CMD ["runserver", "0.0.0.0:8002"] # ,"bash","startup.sh"]
+
+# Uncomment to use Gunicorn
+# ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0 --workers=3 --reload"
+# CMD ["gunicorn", "api.wsgi"]

@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  frontend:
+    user: "${UID}:${GID}"
+    build:
+      context: .
+      dockerfile: dockerfiles/vuejs
+    depends_on:
+      -  backend
+    ports:
+      - "${FRONTEND_PORT}:8080"
+    volumes:
+      - ./src/frontend:/opt/frontend
+    environment:
+      - HOST=0.0.0.0
+      - PORT=${FRONTEND_PORT}
+      - CHOKIDAR_USEPOLLING=true
+      - API_HOST=backend.docker.io
+      - API_PORT=80
+
+  backend:
+    user: "${UID}:${GID}"
+    build:
+      context: .
+      dockerfile: dockerfiles/backend
+    depends_on:
+      - db
+    ports:
+      - "${BACKEND_PORT}:8002"
+    volumes:
+      - ./src/backend:/opt/backend
+    environment:
+      - PYTHONPATH=/opt/backend
+      - DJANGO_SETTINGS_MODULE=api.settings
+      - FRONTEND_PORT=${FRONTEND_PORT}
+      - POSTGRES_DB=docker
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=docker-root
+  db:
+    image: mariadb
+    command: ['--character-set-server=utf8', '--collation-server=utf8_unicode_ci']
+    environment:
+      MYSQL_DATABASE: "docker"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "root"
+      MYSQL_ROOT_PASSWORD: "docker-root"
+  nginx:
+    build: 
+      context: .
+      dockerfile: dockerfiles/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./src/frontend/dist:/usr/share/nginx/html/frontend:ro
+      - ./src/backend/public:/usr/share/nginx/html/backend/public:ro
+    links:
+      - backend
+    depends_on:
+      - backend
